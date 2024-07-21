@@ -1,0 +1,49 @@
+Name
+Template
+
+Jeopardy
+Category 1,Category 2,Category 3,Category 4,Category 5,Category 6
+_,_,_,_,_,_
+Clues
+200,_,_,_,_,_,_
+400,_,_,_,_,_,_
+600,_,_,_,_,_,_
+800,_,_,_,_,_,_
+1000,_,_,_,_,_,_
+Responses
+200,_,_,_,_,_,_
+400,_,_,_,_,_,_
+600,_,_,_,_,_,_
+800,_,_,_,_,_,_
+1000,_,_,_,_,_,_
+Daily Double
+Category (1 through 6),Dollar value
+_,_
+
+Double Jeopardy
+Category 1,Category 2,Category 3,Category 4,Category 5,Category 6
+_,_,_,_,_,_
+Clues
+400,_,_,_,_,_,_
+800,_,_,_,_,_,_
+1200,_,_,_,_,_,_
+1600,_,_,_,_,_,_
+2000,_,_,_,_,_,_
+Responses
+400,_,_,_,_,_,_
+800,_,_,_,_,_,_
+1200,_,_,_,_,_,_
+1600,_,_,_,_,_,_
+2000,_,_,_,_,_,_
+Daily Doubles
+Category (1 through 6), Dollar value
+_,_
+_,_
+
+Final Jeopardy
+Category
+_
+Clue
+_
+Response
+_

@@ -2,6 +2,10 @@ import csv
 import tkinter as tk
 
 
+def left_click(event):
+    print("left")
+
+
 def print_line(arr, start=''):
     if not start:
         start = f'{arr[0]:>4} '
@@ -53,12 +57,11 @@ def main():
     #    quit()
 
     root = tk.Tk()
-
-    root.geometry('1800x900')
     # root.attributes("-fullscreen", True)
     root.title('Jeopardy')
 
-    frame = tk.Frame(root)
+    frame = tk.Frame(root, width=1800, height=900)
+
     for i in range(6):
         frame.columnconfigure(i, weight=1)
 
@@ -71,9 +74,11 @@ def main():
         board.append([])
         for j in range(6):
             board[-1].append(tk.Label(frame, text=str(100 * i + 100), font=('Haettenschweiler', 40)))
-            board[-1][-1].grid(row=i+1, column=j, sticky=tk.W + tk.E)
+            board[-1][-1].grid(row=i + 1, column=j, sticky=tk.W + tk.E)
 
     frame.pack(fill='x')
+
+    root.bind('<Button-1>', left_click)
 
     root.mainloop()
 

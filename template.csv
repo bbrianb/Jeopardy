@@ -18,7 +18,7 @@ Responses
 1000,_,_,_,_,_,_
 Daily Double
 Category (1 through 6),Dollar value
-_,_
+0,100
 
 Double Jeopardy
 Category 1,Category 2,Category 3,Category 4,Category 5,Category 6
@@ -37,8 +37,8 @@ Responses
 2000,_,_,_,_,_,_
 Daily Doubles
 Category (1 through 6), Dollar value
-_,_
-_,_
+0,100
+0,100
 
 Final Jeopardy
 Category

@@ -22,7 +22,7 @@ Category (1 through 6),Dollar value
 
 Double Jeopardy
 Category 1,Category 2,Category 3,Category 4,Category 5,Category 6
-_,_,_,_,_,_
+_,_,_,_,_,dead irish priests
 Clues
 400,_,_,_,_,_,_
 800,_,_,_,_,_,_
@@ -37,8 +37,8 @@ Responses
 2000,_,_,_,_,_,_
 Daily Doubles
 Category (1 through 6), Dollar value
-_,_
-_,_
+0,100
+0,100
 
 Final Jeopardy
 Category

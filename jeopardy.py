@@ -2,8 +2,11 @@ import csv
 import tkinter as tk
 
 
+# noinspection PyUnusedLocal
 def left_click(event):
-    print("left")
+    global click_count
+    click_count += 1
+    print(f'left click {click_count}')
 
 
 def print_line(arr, start=''):
@@ -80,8 +83,12 @@ def main():
 
     root.bind('<Button-1>', left_click)
 
+    global click_count
+    click_count = 0
+
     root.mainloop()
 
 
 if __name__ == '__main__':
+    global click_count
     main()

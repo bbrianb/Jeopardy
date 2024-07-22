@@ -7,6 +7,12 @@ def left_click(event):
     global click_count
     click_count += 1
     print(f'left click {click_count}')
+    if click_count == 1:
+        global frame
+        frame.pack_forget()
+        global root
+        category = tk.Label(root, text=categories_r1[0], font=('Arial Black', 80))
+        category.pack()
 
 
 def print_line(arr, start=''):
@@ -43,7 +49,14 @@ def main():
     print(path)
     print(game[1][0])
     print(game[3][0])
+    global categories_r1
     categories_r1 = game[5]
+    for i, c in enumerate(categories_r1):
+        print(categories_r1[i])
+        print(c)
+        categories_r1[i] = c.upper()
+    print(categories_r1)
+
     print_line(categories_r1, ' ' * 5)
     print_clues_and_responses(game[6:18])
     print(game[18][0])
@@ -59,11 +72,14 @@ def main():
     # if input('Start Game? (y/n) ') == 'n':
     #    quit()
 
+    global root
     root = tk.Tk()
+    root.geometry('1800x900')
     # root.attributes("-fullscreen", True)
     root.title('Jeopardy')
 
-    frame = tk.Frame(root, width=1800, height=900)
+    global frame
+    frame = tk.Frame(root)
 
     for i in range(6):
         frame.columnconfigure(i, weight=1)
@@ -71,13 +87,13 @@ def main():
     board = [[]]
     for i in range(6):
         board[0].append(tk.Label(frame, text="JEOPARDY!", font=('Haettenschweiler', 40)))
-        board[0][-1].grid(row=0, column=i, sticky=tk.W + tk.E)
+        board[0][-1].grid(row=0, column=i)
 
     for i in range(5):
         board.append([])
         for j in range(6):
-            board[-1].append(tk.Label(frame, text=str(100 * i + 100), font=('Haettenschweiler', 40)))
-            board[-1][-1].grid(row=i + 1, column=j, sticky=tk.W + tk.E)
+            board[-1].append(tk.Label(frame, text=f'${100 * i + 100}', font=('Haettenschweiler', 40)))
+            board[-1][-1].grid(row=i + 1, column=j)
 
     frame.pack(fill='x')
 
@@ -91,4 +107,7 @@ def main():
 
 if __name__ == '__main__':
     global click_count
+    global frame
+    global categories_r1
+    global root
     main()

@@ -5,14 +5,25 @@ import tkinter as tk
 # noinspection PyUnusedLocal
 def left_click(event):
     global click_count
+    global root
+    global category
+
     click_count += 1
     print(f'left click {click_count}')
     if click_count == 1:
-        global frame
-        frame.pack_forget()
-        global root
-        category = tk.Label(root, text=categories_r1[0], font=('Arial Black', 80))
-        category.pack()
+        category = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white')
+        category.grid(column=0, row=0, columnspan=6, rowspan=6, sticky=tk.NSEW)
+    elif click_count < 13:
+        if click_count % 2 == 1:
+            category = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white')
+            print('odd')
+        else:
+            category.config(text=categories_r1[click_count//2-1], font=('Arial Black', 100))
+            print('even')
+    else:
+        print('it should keep working')
+        category.config(text='PLEASE WORK')
+        category.grid_remove()
 
 
 def print_line(arr, start=''):
@@ -39,6 +50,10 @@ def print_doubles(categories, line):
 
 
 def main():
+    global categories_r1
+    global root
+    global click_count
+
     path = 'test.csv'
     with open(path) as file:
         csv_file = csv.reader(file)
@@ -49,7 +64,6 @@ def main():
     print(path)
     print(game[1][0])
     print(game[3][0])
-    global categories_r1
     categories_r1 = game[5]
     for i, c in enumerate(categories_r1):
         print(categories_r1[i])
@@ -71,35 +85,31 @@ def main():
     print_doubles(categories_r2, game[40])
     # if input('Start Game? (y/n) ') == 'n':
     #    quit()
-
-    global root
     root = tk.Tk()
-    root.geometry('1800x900')
+    tile_height = 150
+    tile_width = 300
+    root.geometry(f'{tile_width*6}x{tile_height*6}')
     # root.attributes("-fullscreen", True)
     root.title('Jeopardy')
 
-    global frame
-    frame = tk.Frame(root)
+    borders = tk.Frame(root, bg='black')
+    borders.grid(rowspan=6, columnspan=6, sticky=tk.NSEW)
 
-    for i in range(6):
-        frame.columnconfigure(i, weight=1)
-
-    board = [[]]
-    for i in range(6):
-        board[0].append(tk.Label(frame, text="JEOPARDY!", font=('Haettenschweiler', 40)))
-        board[0][-1].grid(row=0, column=i)
-
-    for i in range(5):
+    board = []
+    for row in range(6):
         board.append([])
-        for j in range(6):
-            board[-1].append(tk.Label(frame, text=f'${100 * i + 100}', font=('Haettenschweiler', 40)))
-            board[-1][-1].grid(row=i + 1, column=j)
-
-    frame.pack(fill='x')
+        if row == 0:
+            text = 'JEOPARDY!'
+            text_color = 'white'
+        else:
+            text = f'${200*row}'
+            text_color = 'yellow'
+        for column in range(6):
+            label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color)
+            label.grid(row=row, column=column, sticky=tk.EW, ipadx=59, ipady=43, padx=2, pady=2)
+            board[-1].append(label)
 
     root.bind('<Button-1>', left_click)
-
-    global click_count
     click_count = 0
 
     root.mainloop()
@@ -107,7 +117,7 @@ def main():
 
 if __name__ == '__main__':
     global click_count
-    global frame
     global categories_r1
     global root
+    global category
     main()

@@ -82,6 +82,13 @@ def main():
     print_doubles(categories_r2, game[40])
     # if input('Start Game? (y/n) ') == 'n':
     #    quit()
+    # team1 = input('Team 1 Name: ')
+    # team2 = input('Team 1 Name: ')
+    # team3 = input('Team 1 Name: ')
+    team1 = 'Sea'
+    team2 = 'Sand'
+    team3 = 'Sun'
+
     root = tk.Tk()
     tile_height = 150
     tile_width = 300

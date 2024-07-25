@@ -15,14 +15,11 @@ def left_click(event):
         category.grid(column=0, row=0, columnspan=6, rowspan=6, sticky=tk.NSEW)
     elif click_count < 13:
         if click_count % 2 == 1:
-            category = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white')
-            print('odd')
+            category.config(text='JEOPARDY!', font=('Haettenschweiler', 160))
         else:
             category.config(text=categories_r1[click_count//2-1], font=('Arial Black', 100))
-            print('even')
     else:
         print('it should keep working')
-        category.config(text='PLEASE WORK')
         category.grid_remove()
 
 

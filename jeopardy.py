@@ -2,8 +2,16 @@ import csv
 import tkinter as tk
 
 
+class Object:
+    def __init__(self, clue):
+        self.clue = clue
+
+    def clicked(self, event):
+        print(self.clue)
+
+
 # noinspection PyUnusedLocal
-def left_click(event):
+def anywhere_click(event):
     global click_count
     global root
     global category
@@ -19,7 +27,6 @@ def left_click(event):
         else:
             category.config(text=categories_r1[click_count//2-1], font=('Arial Black', 100))
     else:
-        print('it should keep working')
         category.grid_remove()
 
 
@@ -109,11 +116,16 @@ def main():
             text = f'${200*row}'
             text_color = 'yellow'
         for column in range(6):
+            # need a list of clues that we can pass in here
+            obj = Object('clue')
             label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color)
+            label.bind('<Button-1>', obj.clicked)
             label.grid(row=row, column=column, sticky=tk.EW, ipadx=59, ipady=43, padx=2, pady=2)
-            board[-1].append(label)
+            board[-1].append((label, obj))
 
-    root.bind('<Button-1>', left_click)
+    print(board)
+
+    root.bind('<Button-1>', anywhere_click)
     click_count = 0
 
     root.mainloop()

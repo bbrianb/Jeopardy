@@ -7,7 +7,8 @@ class Object:
         self.clue = clue
 
     def clicked(self, event):
-        print(self.clue)
+        global current_clue
+        current_clue = self.clue
 
 
 # noinspection PyUnusedLocal
@@ -28,6 +29,7 @@ def anywhere_click(event):
             category.config(text=categories_r1[click_count//2-1], font=('Arial Black', 100))
     else:
         category.grid_remove()
+        print(current_clue)
 
 
 def print_line(arr, start=''):
@@ -40,13 +42,25 @@ def print_line(arr, start=''):
     print(arr[-1])
 
 
-def print_clues_and_responses(arr):
-    print(arr[0][0])
-    for line in arr[1:6]:
+def get_clues_and_responses(arr):
+    print(arr[0][0])  # clues
+    clues = arr[1:6]
+    for line in clues:
         print_line(line)
-    print(arr[6][0])
-    for line in arr[7:]:
+    print(arr[6][0])  # responses
+    responses = arr[7:]
+    for line in responses:
         print_line(line)
+    clues_out = []
+    responses_out = []
+    remove_dollar_column(clues, clues_out)
+    remove_dollar_column(responses, responses_out)
+    return clues_out, responses_out
+
+
+def remove_dollar_column(clues, clues_out):
+    for row in clues:
+        clues_out.append(row[1:])
 
 
 def print_doubles(categories, line):
@@ -70,20 +84,17 @@ def main():
     print(game[3][0])
     categories_r1 = game[5]
     for i, c in enumerate(categories_r1):
-        print(categories_r1[i])
-        print(c)
-        categories_r1[i] = c.upper()
-    print(categories_r1)
+        print(i+1, c)
 
     print_line(categories_r1, ' ' * 5)
-    print_clues_and_responses(game[6:18])
+    clues_r1, responses_r1, = get_clues_and_responses(game[6:18])
     print(game[18][0])
     print_doubles(categories_r1, game[20])
 
     print(game[22][0])
     categories_r2 = game[24]
     print_line(categories_r2, ' ' * 5)
-    print_clues_and_responses(game[25:37])
+    clues_r2, responses_r2, = get_clues_and_responses(game[25:37])
     print(game[37][0])
     print_doubles(categories_r2, game[39])
     print_doubles(categories_r2, game[40])
@@ -106,6 +117,8 @@ def main():
     borders = tk.Frame(root, bg='black')
     borders.grid(rowspan=6, columnspan=6, sticky=tk.NSEW)
 
+    print(clues_r1)
+
     board = []
     for row in range(6):
         board.append([])
@@ -116,14 +129,11 @@ def main():
             text = f'${200*row}'
             text_color = 'yellow'
         for column in range(6):
-            # need a list of clues that we can pass in here
-            obj = Object('clue')
+            clue = clues_r1[row-1][column]
+            obj = Object(clue)
             label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color)
             label.bind('<Button-1>', obj.clicked)
             label.grid(row=row, column=column, sticky=tk.EW, ipadx=59, ipady=43, padx=2, pady=2)
-            board[-1].append((label, obj))
-
-    print(board)
 
     root.bind('<Button-1>', anywhere_click)
     click_count = 0
@@ -136,4 +146,5 @@ if __name__ == '__main__':
     global categories_r1
     global root
     global category
+    global current_clue
     main()

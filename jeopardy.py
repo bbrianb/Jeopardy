@@ -1,4 +1,5 @@
 import csv
+import time
 import tkinter as tk
 
 
@@ -15,21 +16,27 @@ class Object:
 def anywhere_click(event):
     global click_count
     global root
-    global category
+    global full_screen
+    global current_clue
 
     click_count += 1
-    print(f'left click {click_count}')
     if click_count == 1:
-        category = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white')
-        category.grid(column=0, row=0, columnspan=6, rowspan=6, sticky=tk.NSEW)
+        full_screen = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white')
+        full_screen.grid(column=0, row=0, columnspan=6, rowspan=6, sticky=tk.NSEW)
     elif click_count < 13:
         if click_count % 2 == 1:
-            category.config(text='JEOPARDY!', font=('Haettenschweiler', 160))
+            full_screen.config(text='JEOPARDY!', font=('Haettenschweiler', 160))
         else:
-            category.config(text=categories_r1[click_count//2-1], font=('Arial Black', 100))
+            full_screen.config(text=categories_r1[click_count // 2 - 1], font=('Arial Black', 100))
+    elif click_count == 13:
+        full_screen.grid_remove()
+        current_clue = ''
     else:
-        category.grid_remove()
-        print(current_clue)
+        if current_clue != '':
+            time.sleep(1)
+            full_screen.config(text=current_clue)
+            full_screen.grid()
+            # now have to add a click for done reading the clue
 
 
 def print_line(arr, start=''):
@@ -145,6 +152,6 @@ if __name__ == '__main__':
     global click_count
     global categories_r1
     global root
-    global category
+    global full_screen
     global current_clue
     main()

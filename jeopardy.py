@@ -18,6 +18,7 @@ def anywhere_click(event):
     global root
     global full_screen
     global current_clue
+    global current_state
 
     click_count += 1
     if click_count == 1:
@@ -30,13 +31,16 @@ def anywhere_click(event):
             full_screen.config(text=categories_r1[click_count // 2 - 1], font=('Arial Black', 100))
     elif click_count == 13:
         full_screen.grid_remove()
+        current_state = 'waiting for clue'
         current_clue = ''
     else:
-        if current_clue != '':
+        if current_state == 'waiting for clue' and current_clue != '':
+            current_state = 'reading clue'
             time.sleep(1)
             full_screen.config(text=current_clue)
             full_screen.grid()
-            # now have to add a click for done reading the clue
+        elif current_state == 'reading clue':
+            current_state = 'waiting for response'
 
 
 def print_line(arr, start=''):
@@ -154,4 +158,5 @@ if __name__ == '__main__':
     global root
     global full_screen
     global current_clue
+    global current_state
     main()

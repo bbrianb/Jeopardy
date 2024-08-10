@@ -49,8 +49,10 @@ def click_or_key(event):
         else:
             full_screen.config(text=categories_r1[event_count // 2 - 1], font=('Arial Black', 100))
     elif event_count == 13:
-        for i, label in enumerate(category_labels):
-            label.config(text=categories_r1[i].upper(), font=('Haettenschweiler', 20))
+        for column, label in enumerate(category_labels):
+            label.grid_remove()
+            label.config(text=categories_r1[column], font=('Arial Black', 20))
+            label.grid(row=0, column=column)
         full_screen.grid_remove()
         current_clue = ''
         current_state = 'waiting for clue'
@@ -148,8 +150,7 @@ def main():
 
     root = tk.Tk()
     tile_height = 150
-    tile_width = 280
-    root.geometry(f'{int(tile_width * 6.75)}x{tile_height * 6}')
+    tile_width = 270
     # root.attributes("-fullscreen", True)
     root.title('Jeopardy')
 
@@ -159,7 +160,6 @@ def main():
     print(clues_r1)
 
     category_labels = []
-    pad = 51
     for row in range(6):
         if row == 0:
             text = 'JEOPARDY!'
@@ -170,20 +170,31 @@ def main():
         for column in range(6):
             clue = clues_r1[row - 1][column]
             obj = Object(clue)
-            label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color)
+
+            frame = tk.Frame(root, bg='blue', width=tile_width, height=tile_height)
+            frame.grid(row=row, column=column, padx=2, pady=2)
+
+            label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color,
+                             wraplength=tile_width-30)
+
             if row != 0:
                 label.bind('<Button-1>', obj.clicked)
-            label.grid(row=row, column=column, sticky=tk.EW, ipadx=pad, ipady=43, padx=2, pady=2)
+
+            label.grid(row=row, column=column)
+
             if row == 0:
                 category_labels.append(label)
+
+        frame = tk.Frame(root, bg='blue', width=0.75*tile_width, height=tile_height)
+        frame.grid(row=row, column=6, padx=2, pady=2)
         if row % 2 == 0:
-            team_labels.append(tk.Label(root, text=teams[int(row/2)], font=('Haettenschweiler', 40), bg='blue',
+            team_labels.append(tk.Label(root, text=teams[int(row/2)], font=('Haettenschweiler', 30), bg='blue',
                                         fg='white'))
-            team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, ipadx=pad, padx=2, pady=2)
+            team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
         else:
-            team_labels.append(tk.Label(root, text=f'${team_money[int((row-1)/2)]}', font=('Haettenschweiler', 30),
+            team_labels.append(tk.Label(root, text=f'${team_money[int((row-1)/2)]}', font=('Haettenschweiler', 20),
                                         bg='blue', fg='white'))
-            team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, ipadx=pad, padx=2, pady=2)
+            team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
 
     global buzz
     buzz = tk.Label(root, text='Buzz in!', font=('Haettenschweiler', 40), bg='white', fg='black')

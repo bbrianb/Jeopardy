@@ -41,7 +41,8 @@ def click_or_key(event):
 
     event_count += 1
     if event_count == 1:
-        full_screen = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white')
+        full_screen = tk.Label(root, text='JEOPARDY!', font=('Haettenschweiler', 160), bg='blue', fg='white',
+                               wraplength=1300)
         full_screen.grid(column=0, row=0, columnspan=6, rowspan=6, sticky=tk.NSEW)
     elif event_count < 13:
         if event_count % 2 == 1:
@@ -71,7 +72,7 @@ def click_or_key(event):
         elif current_state == 'waiting for response':
             print(key_pressed)
             current_state = 'evaluating response'
-    print(f'{event_count=}, {current_state=}')
+    print(f'{event_count=}, {current_state=}, {current_clue=}')
 
 
 def print_line(arr, start=''):
@@ -115,6 +116,7 @@ def main():
     global event_count
     global current_state
     global category_labels
+    global current_clue
 
     path = 'test.csv'
     with open(path) as file:
@@ -126,7 +128,9 @@ def main():
     print(path)
     print(game[1][0])
     print(game[3][0])
-    categories_r1 = game[5]
+    categories_r1 = []
+    for category in game[5]:
+        categories_r1.append(category.upper())
     for team_name, c in enumerate(categories_r1):
         print(team_name + 1, c)
 
@@ -178,6 +182,7 @@ def main():
                              wraplength=tile_width-30)
 
             if row != 0:
+                frame.bind('<Button-1>', obj.clicked)
                 label.bind('<Button-1>', obj.clicked)
 
             label.grid(row=row, column=column)
@@ -188,7 +193,7 @@ def main():
         frame = tk.Frame(root, bg='blue', width=0.75*tile_width, height=tile_height)
         frame.grid(row=row, column=6, padx=2, pady=2)
         if row % 2 == 0:
-            team_labels.append(tk.Label(root, text=teams[int(row/2)], font=('Haettenschweiler', 30), bg='blue',
+            team_labels.append(tk.Label(root, text=teams[int(row/2)], font=('Calibri', 30), bg='blue',
                                         fg='white'))
             team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
         else:
@@ -208,6 +213,7 @@ def main():
     event_count = 0
 
     current_state = 'introduction'
+    current_clue = ''
 
     root.mainloop()
 

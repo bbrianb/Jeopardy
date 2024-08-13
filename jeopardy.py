@@ -22,13 +22,19 @@ class KeyPress:
 
 
 class ClueLabel:
-    def __init__(self, clue):
+    def __init__(self, clue, response, value):
         self.clue = clue
+        self.value = value
+        self.response = response
 
     # noinspection PyUnusedLocal
     def clicked(self, event):
         global current_clue
+        global current_value
+        global current_response
         current_clue = self.clue
+        current_value = self.value
+        current_response = self.response
 
 
 class Verify:
@@ -49,6 +55,8 @@ def click_or_key(event):
     global current_state
     global key_pressed
     global right
+    global current_team
+    global current_response
 
     event_count += 1
     if event_count == 1:
@@ -68,40 +76,51 @@ def click_or_key(event):
         full_screen.grid_remove()
         current_clue = ''
         current_state = 'waiting for clue'
-    else:
-        if current_state == 'waiting for clue' and current_clue != '':
-            buzz.grid_remove()
-            time.sleep(1)
-            full_screen.config(text=current_clue)
-            full_screen.grid()
-            current_state = 'reading clue'
-        elif current_state == 'reading clue':
-            buzz.tkraise()
-            key_pressed = ''
-            buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
-            current_state = 'waiting for response'
-        elif current_state == 'waiting for response' and key_pressed != '':
-            team = None
-            if key_pressed == 'q':
-                team = 0
-            elif key_pressed == 'v':
-                team = 2
-            else:
-                team = 4
-            team_labels[team].config(bg='goldenrod')
-            team = team/2
-            buzz.grid_remove()
-            right = None
-            incorrect.grid(column=2, row=5, sticky=tk.NSEW)
-            correct.grid(column=3, row=5, sticky=tk.NSEW)
-            incorrect.tkraise()
-            correct.tkraise()
-            current_state = 'evaluating response'
-        elif current_state == 'evaluating response' and right is not None:
-            if right:
-                pass
+    elif current_state == 'waiting for clue' and current_clue != '':
+        buzz.grid_remove()
+        time.sleep(1)
+        full_screen.config(text=current_clue)
+        full_screen.grid()
+        current_state = 'reading clue'
+    elif current_state == 'reading clue':
+        buzz.tkraise()
+        buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
+        current_state = 'waiting for response'
+    elif current_state == 'waiting for response' and key_pressed != '':
+        if key_pressed == 'q':
+            current_team = 0
+        elif key_pressed == 'v':
+            current_team = 1
+        else:
+            current_team = 2
+        team_labels[current_team * 2].config(bg='goldenrod')
+        buzz.grid_remove()
+        incorrect.grid(column=2, row=5, sticky=tk.NSEW)
+        correct.grid(column=3, row=5, sticky=tk.NSEW)
+        incorrect.tkraise()
+        correct.tkraise()
+        current_state = 'evaluating response'
+    elif current_state == 'evaluating response' and right is not None:
+        incorrect.grid_remove()
+        correct.grid_remove()
 
-    # print(f'{event_count=}, {current_state=}, {current_clue=}')
+        if right:
+            team_money[current_team] += current_value
+        else:
+            team_money[current_team] -= current_value
+
+        if team_money[current_team] < 0:
+            negative = '-'
+        else:
+            negative = ''
+        team_labels[2 * current_team + 1].config(text=f'{negative}${abs(team_money[current_team])}')
+
+        if right:
+            full_screen.config(text=current_response)
+            full_screen.grid()
+            current_state = 'clue finished'
+
+    print(f'{event_count=}, {current_state=}, {current_clue=}, {key_pressed=}, {right=}, {current_value=}')
 
 
 def print_line(arr, start=''):
@@ -127,7 +146,17 @@ def get_clues_and_responses(arr):
     responses_out = []
     remove_dollar_column(clues, clues_out)
     remove_dollar_column(responses, responses_out)
+
+    make_caps(clues_out)
+    make_caps(responses_out)
+
     return clues_out, responses_out
+
+
+def make_caps(clues_out):
+    for row_num, row in enumerate(clues_out):
+        for col_num, clue in enumerate(row):
+            clues_out[row_num][col_num] = clue.upper()
 
 
 def remove_dollar_column(clues, clues_out):
@@ -149,6 +178,8 @@ def main():
     global team_labels
     global correct
     global incorrect
+    global team_money
+    global key_pressed
     global right
 
     path = 'test.csv'
@@ -194,8 +225,6 @@ def main():
     borders = tk.Frame(root, bg='black')
     borders.grid(rowspan=6, columnspan=7, sticky=tk.NSEW)
 
-    print(clues_r1)
-
     category_labels = []
     for row in range(6):
         if row == 0:
@@ -206,7 +235,8 @@ def main():
             text_color = 'yellow'
         for column in range(6):
             clue = clues_r1[row - 1][column]
-            obj = ClueLabel(clue)
+            response = responses_r1[row - 1][column]
+            obj = ClueLabel(clue, response, row * 200)
 
             frame = tk.Frame(root, bg='blue', width=tile_width, height=tile_height)
             frame.grid(row=row, column=column, padx=2, pady=2)
@@ -245,14 +275,17 @@ def main():
 
     correct = tk.Label(root, text='Correct', font=('Haettenschweiler', 40), bg='green', fg='black')
     incorrect = tk.Label(root, text='Incorrect', font=('Haettenschweiler', 40), bg='red', fg='black')
-    c, i = Verify('True'), Verify('False')
+    c, i = Verify(True), Verify(False)
     correct.bind('<Button-1>', c.clicked)
-    correct.bind('<Button-1>', i.clicked)
+    incorrect.bind('<Button-1>', i.clicked)
 
     event_count = 0
 
     current_state = 'introduction'
     current_clue = ''
+
+    key_pressed = ''
+    right = None
 
     root.mainloop()
 
@@ -271,4 +304,8 @@ if __name__ == '__main__':
     global correct
     global incorrect
     global right
+    global team_money
+    global current_value
+    global current_team
+    global current_response
     main()

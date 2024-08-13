@@ -21,7 +21,7 @@ class KeyPress:
             self.penalty = False
 
 
-class Object:
+class ClueLabel:
     def __init__(self, clue):
         self.clue = clue
 
@@ -31,6 +31,16 @@ class Object:
         current_clue = self.clue
 
 
+class Verify:
+    def __init__(self, right_bool):
+        self.correct = right_bool
+
+    # noinspection PyUnusedLocal
+    def clicked(self, event):
+        global right
+        right = self.correct
+
+
 # noinspection PyUnusedLocal
 def click_or_key(event):
     global event_count
@@ -38,6 +48,7 @@ def click_or_key(event):
     global current_clue
     global current_state
     global key_pressed
+    global right
 
     event_count += 1
     if event_count == 1:
@@ -69,16 +80,26 @@ def click_or_key(event):
             key_pressed = ''
             buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
             current_state = 'waiting for response'
-        elif current_state == 'waiting for response':
-            current_state = 'evaluating response'
-            r = None
+        elif current_state == 'waiting for response' and key_pressed != '':
+            team = None
             if key_pressed == 'q':
-                r = 0
+                team = 0
             elif key_pressed == 'v':
-                r = 2
+                team = 2
             else:
-                r = 4
-            team_labels[r].config(bg='goldenrod')
+                team = 4
+            team_labels[team].config(bg='goldenrod')
+            team = team/2
+            buzz.grid_remove()
+            right = None
+            incorrect.grid(column=2, row=5, sticky=tk.NSEW)
+            correct.grid(column=3, row=5, sticky=tk.NSEW)
+            incorrect.tkraise()
+            correct.tkraise()
+            current_state = 'evaluating response'
+        elif current_state == 'evaluating response' and right is not None:
+            if right:
+                pass
 
     # print(f'{event_count=}, {current_state=}, {current_clue=}')
 
@@ -126,6 +147,9 @@ def main():
     global category_labels
     global current_clue
     global team_labels
+    global correct
+    global incorrect
+    global right
 
     path = 'test.csv'
     with open(path) as file:
@@ -182,13 +206,13 @@ def main():
             text_color = 'yellow'
         for column in range(6):
             clue = clues_r1[row - 1][column]
-            obj = Object(clue)
+            obj = ClueLabel(clue)
 
             frame = tk.Frame(root, bg='blue', width=tile_width, height=tile_height)
             frame.grid(row=row, column=column, padx=2, pady=2)
 
             label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color,
-                             wraplength=tile_width-30)
+                             wraplength=tile_width - 30)
 
             if row != 0:
                 frame.bind('<Button-1>', obj.clicked)
@@ -199,14 +223,14 @@ def main():
             if row == 0:
                 category_labels.append(label)
 
-        frame = tk.Frame(root, bg='blue', width=0.75*tile_width, height=tile_height)
+        frame = tk.Frame(root, bg='blue', width=0.75 * tile_width, height=tile_height)
         frame.grid(row=row, column=6, padx=2, pady=2)
         if row % 2 == 0:
-            team_labels.append(tk.Label(root, text=teams[int(row/2)], font=('Calibri', 30), bg='blue',
+            team_labels.append(tk.Label(root, text=teams[int(row / 2)], font=('Calibri', 30), bg='blue',
                                         fg='white'))
             team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
         else:
-            team_labels.append(tk.Label(root, text=f'${team_money[int((row-1)/2)]}', font=('Arial Black', 20),
+            team_labels.append(tk.Label(root, text=f'${team_money[int((row - 1) / 2)]}', font=('Arial Black', 20),
                                         bg='blue', fg='white'))
             team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
 
@@ -218,6 +242,12 @@ def main():
     root.bind('q', q.pressed)
     root.bind('v', v.pressed)
     root.bind('p', p.pressed)
+
+    correct = tk.Label(root, text='Correct', font=('Haettenschweiler', 40), bg='green', fg='black')
+    incorrect = tk.Label(root, text='Incorrect', font=('Haettenschweiler', 40), bg='red', fg='black')
+    c, i = Verify('True'), Verify('False')
+    correct.bind('<Button-1>', c.clicked)
+    correct.bind('<Button-1>', i.clicked)
 
     event_count = 0
 
@@ -238,4 +268,7 @@ if __name__ == '__main__':
     global key_pressed
     global category_labels
     global team_labels
+    global correct
+    global incorrect
+    global right
     main()

@@ -65,14 +65,22 @@ def click_or_key(event):
             full_screen.grid()
             current_state = 'reading clue'
         elif current_state == 'reading clue':
-            buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
             buzz.tkraise()
             key_pressed = ''
+            buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
             current_state = 'waiting for response'
         elif current_state == 'waiting for response':
-            print(key_pressed)
             current_state = 'evaluating response'
-    print(f'{event_count=}, {current_state=}, {current_clue=}')
+            r = None
+            if key_pressed == 'q':
+                r = 0
+            elif key_pressed == 'v':
+                r = 2
+            else:
+                r = 4
+            team_labels[r].config(bg='goldenrod')
+
+    # print(f'{event_count=}, {current_state=}, {current_clue=}')
 
 
 def print_line(arr, start=''):
@@ -117,6 +125,7 @@ def main():
     global current_state
     global category_labels
     global current_clue
+    global team_labels
 
     path = 'test.csv'
     with open(path) as file:
@@ -197,7 +206,7 @@ def main():
                                         fg='white'))
             team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
         else:
-            team_labels.append(tk.Label(root, text=f'${team_money[int((row-1)/2)]}', font=('Haettenschweiler', 20),
+            team_labels.append(tk.Label(root, text=f'${team_money[int((row-1)/2)]}', font=('Arial Black', 20),
                                         bg='blue', fg='white'))
             team_labels[-1].grid(row=row, column=6, sticky=tk.NSEW, padx=2, pady=2)
 
@@ -228,4 +237,5 @@ if __name__ == '__main__':
     global buzz
     global key_pressed
     global category_labels
+    global team_labels
     main()

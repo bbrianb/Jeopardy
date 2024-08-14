@@ -12,7 +12,8 @@ class KeyPress:
     def pressed(self, event):
         global key_pressed
 
-        if current_state == 'waiting for response' and not self.penalty and key_pressed == '':
+        if (current_state == 'waiting for response' and not self.penalty and key_pressed == '' and
+                self.key in acceptable_keys):
             key_pressed += self.key
             click_or_key(None)
         else:
@@ -22,19 +23,25 @@ class KeyPress:
 
 
 class ClueLabel:
-    def __init__(self, clue, response, value):
+    def __init__(self, clue, response, value, label):
         self.clue = clue
         self.value = value
         self.response = response
+        self.label = label
+        self.already_clicked = False
 
     # noinspection PyUnusedLocal
     def clicked(self, event):
-        global current_clue
-        global current_value
-        global current_response
-        current_clue = self.clue
-        current_value = self.value
-        current_response = self.response
+        if current_state == 'waiting for clue' and not self.already_clicked:
+            global current_clue
+            global current_value
+            global current_response
+            global current_label
+            current_clue = self.clue
+            current_value = self.value
+            current_response = self.response
+            current_label = self.label
+            self.already_clicked = True
 
 
 class Verify:
@@ -57,6 +64,7 @@ def click_or_key(event):
     global right
     global current_team
     global current_response
+    global acceptable_keys
 
     event_count += 1
     if event_count == 1:
@@ -77,16 +85,16 @@ def click_or_key(event):
         current_clue = ''
         current_state = 'waiting for clue'
     elif current_state == 'waiting for clue' and current_clue != '':
-        buzz.grid_remove()
-        time.sleep(1)
         full_screen.config(text=current_clue)
+        time.sleep(0.25)
+        current_label.grid_remove()
+        time.sleep(0.25)
         full_screen.grid()
         current_state = 'reading clue'
     elif current_state == 'reading clue':
-        buzz.tkraise()
-        buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
-        current_state = 'waiting for response'
-    elif current_state == 'waiting for response' and key_pressed != '':
+        acceptable_keys = ['q', 'v', 'p']
+        prepare_for_response()
+    elif current_state == 'waiting for response' and key_pressed in acceptable_keys:
         if key_pressed == 'q':
             current_team = 0
         elif key_pressed == 'v':
@@ -119,8 +127,32 @@ def click_or_key(event):
             full_screen.config(text=current_response)
             full_screen.grid()
             current_state = 'clue finished'
+        else:
+            # there's more to be done here
+            acceptable_keys.remove(key_pressed)
+            reset_yellow()
+            prepare_for_response()
+
+    elif current_state == 'clue finished':
+        reset_yellow()
+        full_screen.grid_remove()
+        current_clue = ''
+        current_state = 'waiting for clue'
 
     print(f'{event_count=}, {current_state=}, {current_clue=}, {key_pressed=}, {right=}, {current_value=}')
+
+
+def reset_yellow():
+    for label in team_labels:
+        label.config(bg='blue')
+
+
+def prepare_for_response():
+    global key_pressed, current_state
+    key_pressed = ''
+    buzz.tkraise()
+    buzz.grid(column=2, row=5, columnspan=2, sticky=tk.NSEW)
+    current_state = 'waiting for response'
 
 
 def print_line(arr, start=''):
@@ -181,6 +213,7 @@ def main():
     global team_money
     global key_pressed
     global right
+    global current_value
 
     path = 'test.csv'
     with open(path) as file:
@@ -236,13 +269,13 @@ def main():
         for column in range(6):
             clue = clues_r1[row - 1][column]
             response = responses_r1[row - 1][column]
-            obj = ClueLabel(clue, response, row * 200)
 
             frame = tk.Frame(root, bg='blue', width=tile_width, height=tile_height)
             frame.grid(row=row, column=column, padx=2, pady=2)
 
             label = tk.Label(root, text=text, font=('Haettenschweiler', 40), bg='blue', fg=text_color,
                              wraplength=tile_width - 30)
+            obj = ClueLabel(clue, response, row * 200, label)
 
             if row != 0:
                 frame.bind('<Button-1>', obj.clicked)
@@ -283,6 +316,7 @@ def main():
 
     current_state = 'introduction'
     current_clue = ''
+    current_value = 0
 
     key_pressed = ''
     right = None
@@ -308,4 +342,6 @@ if __name__ == '__main__':
     global current_value
     global current_team
     global current_response
+    global current_label
+    global acceptable_keys
     main()
